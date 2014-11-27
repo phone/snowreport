@@ -5,12 +5,12 @@ import (
 	"code.google.com/p/go-charset/charset"
 	_ "code.google.com/p/go-charset/data"
 	"encoding/xml"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
-	"errors"
 )
 
 //?lat=xxxxxx& lon=yyyyy&   unit=0&    lg=english&  FcstType=dwml
@@ -93,7 +93,8 @@ func (l *Location) GetForecasts() ([]*Forecast, error) {
 			break
 		}
 	}
-	for i := 0; i < 14; i++ {
+	maxidx := len(datum.WordedForecasts)
+	for i := 0; i < maxidx; i++ {
 		fcst := &Forecast{
 			LocationId: l.Id,
 			Index:      i,
@@ -101,7 +102,7 @@ func (l *Location) GetForecasts() ([]*Forecast, error) {
 		tl14 := TimeLayout{}
 		for _, tl := range datum.TimeLayouts {
 			tl := tl
-			if len(tl.Periods) == 14 {
+			if len(tl.Periods) == maxidx {
 				tl14 = tl
 				break
 			}

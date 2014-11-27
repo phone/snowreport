@@ -57,7 +57,7 @@ func TestGetForecasts(t *testing.T) {
 	}
 }
 
-func XTestPullWeather(t *testing.T) {
+func TestPullWeather(t *testing.T) {
 	var (
 		url = "http://forecast.weather.gov/MapClick.php?lat=42.45189&lon=-71.87972699870119&unit=0&lg=english&FcstType=dwml"
 		cl  = &http.Client{Transport: &http.Transport{MaxIdleConnsPerHost: 4}}
