@@ -1,11 +1,12 @@
 package main
 
 import (
-	//"database/sql"
 	"code.google.com/p/go-charset/charset"
 	_ "code.google.com/p/go-charset/data"
+	"database/sql"
 	"encoding/xml"
 	"errors"
+	_ "github.com/go-sql-driver/mysql"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -134,4 +135,51 @@ type Forecast struct {
 	Low        int
 	Icon       string
 	Date       int64
+}
+
+// assumes sql server in ANSI_QUOTES or ANSI modes
+const INSSTR string = `INSERT INTO forecast (
+	location_id,
+	"index",
+	datedesc,
+	summary,
+	forecast,
+	high,
+	low,
+	icon)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+	location_id=VALUES(location_id),
+	"index"=VALUES("index"),
+	datedesc=VALUES(datedesc),
+	summary=VALUES(summary),
+	forecast=VALUES(forecast),
+	high=VALUES(high),
+	low=VALUES(low),
+	icon=VALUES(icon)
+`
+
+func (f *Forecast) Upsert(db *sql.DB) error {
+	var (
+		err error
+	)
+	if err = db.Ping(); err != nil {
+		return err
+	}
+
+	_, err = db.Exec(
+		INSSTR,
+		f.LocationId,
+		f.Index,
+		f.DateDesc,
+		f.Summary,
+		f.Forecast,
+		f.High,
+		f.Low,
+		f.Icon,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }
