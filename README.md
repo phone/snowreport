@@ -13,7 +13,7 @@ Prerequisistes:
 
 Install golang prerequisites with `go get -t -v ./`
 
-Setup the MySQL schema with [etc/schema.sql](https://github.com/phone/snowreport/blob/master/etc/schema.sql), into an empty database.
+Setup the MySQL schema with [etc/schema.sql](https://github.com/phone/snowreport/blob/master/etc/schema.sql), into an empty database. Then add some locations. An example is in [etc/data.sql](https://github.com/phone/snowreport/blob/master/etc/data.sql). Make sure your MySQL server is in ANSI mode. Do this with `SET GLOBAL sql_mode = 'ANSI';`.
 
 Etcd stores the mysql connection information. Keys required are:
 * `/snowreport/mysql/user`
@@ -24,4 +24,4 @@ Etcd stores the mysql connection information. Keys required are:
 
 They do what you think. Add them with e.g. `curl -L http://localhost:4001/v2/keys/snowreport/mysql/user -XPUT -d value="snowreport"`
 
-Exercise the program with `go test -v`
+Exercise the program with `go test -v`. There should be plenty of explanatory output.
