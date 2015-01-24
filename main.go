@@ -5,13 +5,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
-	"encoding/json"
+	"flag"
 )
 import _ "net/http/pprof"
 
 var (
-	db *sql.DB
-	err error
+	db   *sql.DB
+	err  error
+	port *string
+	www  *bool
 )
 
 func collect() {
@@ -31,11 +33,10 @@ func collect() {
 	}
 }
 
-func srv(port int) {
+func srv(port string) {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
 	})
-	http.HandleFunc("/", HandleEvent)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
@@ -47,8 +48,8 @@ func init() {
 }
 
 func main() {
-	www := flag.Bool("www", false, "run webserver")
-	port := flag.String("p", "8080", "server listen port")
+	www = flag.Bool("www", false, "run webserver")
+	port = flag.String("p", "8080", "server listen port")
 	flag.Parse()
 	if !*www {
 		collect()

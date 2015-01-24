@@ -55,6 +55,9 @@ func TestGetForecasts(t *testing.T) {
 		t.FailNow()
 	}
 	for _, fc := range forecasts {
+		if fc == nil {
+			continue
+		}
 		t.Log(*fc)
 	}
 }
@@ -131,6 +134,7 @@ func TestMysql(t *testing.T) {
 		password string
 		host     string
 		port     string
+		datab    string
 		err      error
 		db       *sql.DB
 		ecl      *etcd.Client
@@ -138,21 +142,30 @@ func TestMysql(t *testing.T) {
 	ecl = etcd.NewClient([]string{"http://127.0.0.1:4001/"})
 	user, err = GetEtcdVal(ecl, "/snowreport/mysql/user")
 	if err != nil {
+		t.Log(err)
 		t.FailNow()
 	}
 	password, err = GetEtcdVal(ecl, "/snowreport/mysql/password")
 	if err != nil {
+		t.Log(err)
 		t.FailNow()
 	}
 	host, err = GetEtcdVal(ecl, "/snowreport/mysql/host")
 	if err != nil {
+		t.Log(err)
 		t.FailNow()
 	}
 	port, err = GetEtcdVal(ecl, "/snowreport/mysql/port")
 	if err != nil {
+		t.Log(err)
 		t.FailNow()
 	}
-	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/snow", user, password, host, port))
+	datab, err = GetEtcdVal(ecl, "/snowreport/mysql/db")
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, datab))
 	if err != nil {
 		t.Log(err)
 		t.Fail()
@@ -164,7 +177,7 @@ func TestMysql(t *testing.T) {
 	}
 }
 
-func XTestDataCollection(t *testing.T) {
+func TestDataCollection(t *testing.T) {
 	l := &Location{
 		Id:    1,
 		Name:  "Wachusett",
@@ -185,12 +198,20 @@ func XTestDataCollection(t *testing.T) {
 		t.FailNow()
 	}
 	for _, fc := range forecasts {
+		if fc == nil {
+			continue
+		}
 		fc.Upsert(db)
 	}
 }
 
 func TestGetLocations(t *testing.T) {
-	ls, err := GetLocations()
+	db, err := GetDb()
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+	ls, err := GetLocations(db)
 	if err != nil {
 		t.Log(err)
 		t.FailNow()

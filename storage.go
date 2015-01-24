@@ -26,6 +26,7 @@ func GetDb() (*sql.DB, error) {
 			"/snowreport/mysql/password",
 			"/snowreport/mysql/host",
 			"/snowreport/mysql/port",
+			"/snowreport/mysql/db",
 		}
 		vals []interface{} = make([]interface{}, len(ks), len(ks))
 		ecl                = etcd.NewClient([]string{"http://127.0.0.1:4001/"})
@@ -39,7 +40,7 @@ func GetDb() (*sql.DB, error) {
 		}
 		vals[i] = tmp
 	}
-	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/snow", vals...))
+	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", vals...))
 	if err != nil {
 		return nil, err
 	}
