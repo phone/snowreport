@@ -2,10 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
-	"flag"
 )
 import _ "net/http/pprof"
 
